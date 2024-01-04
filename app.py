@@ -1,4 +1,3 @@
-import requests
 from time import sleep
 from telegramBot import telegramBot
 from connection import connection

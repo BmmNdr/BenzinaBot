@@ -1,6 +1,5 @@
 import mysql.connector
 import requests
-import csv
 
 #Utenti(ID, tipoCarburante, Consumo, Capienza)
 #Prezzi(idImpianto*, tipoCarburante, prezzo, isSelf, dtComu)
