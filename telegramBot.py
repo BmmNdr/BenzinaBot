@@ -1,12 +1,10 @@
 import requests
 import time
 
-BOT_TOKEN = "bot6450047602:AAHYA1jfTMs0DQ94YUi1NFex52v3tRMMLbo"
-
 class telegramBot:
     
-    def __init__(self):
-        self.url = f"https://api.telegram.org/{BOT_TOKEN}"
+    def __init__(self, bot_token):
+        self.url = f"https://api.telegram.org/{bot_token}"
         self.offset = 0
     
     #get new messages received by the bot
