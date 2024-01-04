@@ -11,7 +11,7 @@ class connection:
             host="localhost",
             user="root",
             password="",
-            database="fuelbot"
+            database="db_botbenzina"
             )
         
     
