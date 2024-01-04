@@ -69,5 +69,4 @@ class telegramBot:
         
     #make a refueling
     def Refuel(self, chat_id): #TODO
-        params = {"chat_id":chat_id, "text":text}
-        requests.post(self.url+"/sendMessage", params=params)
+        self.sendMessage(chat_id, "Rifornimento")

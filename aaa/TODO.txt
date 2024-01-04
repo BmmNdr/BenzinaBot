@@ -34,7 +34,8 @@ Connettersi ad un db con python:
 	mydb = mysql.connector.connect(
 	  host="localhost",
 	  user="yourusername",
-	  password="yourpassword"
+	  password="yourpassword",
+	  database="mydbname"
 	)
 	
 
@@ -72,3 +73,5 @@ Aggiornare dati in un db:
 aggiornacarburante - Modifica il tipo di carburante
 aggiornacapienza - Modifica la capienza del serbatoio
 rifornimento - Trova il benzinaio piu' conveniente
+
+TODO create a script to install all the needed pip package if not installed

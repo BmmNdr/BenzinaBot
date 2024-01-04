@@ -11,6 +11,8 @@ while(True):
         chat_id = msg["message"]["chat"]["id"]
         text = msg["message"]["text"]
         
+        print(str(chat_id) + ": " + text)
+        
         if(text == "/start"):
             naftaBot.sendMessage(chat_id, "Benvenuto nel Nafta bot")
         elif(text == "/aggiornacarburante"):
