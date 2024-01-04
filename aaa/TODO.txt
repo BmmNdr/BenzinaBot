@@ -1,0 +1,74 @@
+L'update id e' unico per ogni utente (anche se la chat viene cancellata). Quindi nel database si puo' utilizzare come chiave.
+
+Esiste una tabella Utenti(ID, tipoCarburante, Consumo, Capienza)
+Tabella Prezzi(idImpianto, tipoCarburante, prezzo, isSelf, dtComu)
+Tabella Impianti(idImpianto, Gestore, Bandiera, TipoImpianto, NomeImpianto, Indirizzo, Comune, Provincia, Latitudine, Longitudine)
+
+Creare i comandi per il bot. UpdateCarburante, UpdateConsumo, UpdateCapienza, Rifornimento.
+Il comando rifornimento richiede all'utente quanto vuole rifornire (1/4, 1/2, 3/4, Pieno) e la posizione al momento della richiesta.
+
+Se e' un nuovo utente inizia la procedura per inserire i primi valori di carburante, consumo e capienza. 
+
+
+
+Scaricare un file con python:
+	rq = requests.get("{url}")
+	url_content = req.content
+	csv_file = open("{nomeFile}", "wb")
+	csv_file.write(url_content)
+	csv_file.close()
+	
+	
+	
+Leggere un csv con python:
+	import csv
+	with open('{nomeFile}', mode='r') as csv_file:
+		csv_reader = csv.DictReader(csv_file) 
+		for row in csv_reader:
+			row["{columnName}"]
+		
+		
+
+Connettersi ad un db con python:
+	import mysql.connector
+	mydb = mysql.connector.connect(
+	  host="localhost",
+	  user="yourusername",
+	  password="yourpassword"
+	)
+	
+
+
+Inserire dati in un db con python:
+	mycursor = mydb.cursor()
+	sql = "INSERT INTO customers (name, address) VALUES (%s, %s)"
+	val = [
+			('Peter', 'Lowstreet 4'),
+			('Amy', 'Apple st 652'),
+			('Hannah', 'Mountain 21')
+		]
+	mycursor.execute(sql, val)
+	mydb.commit()
+	
+	
+
+Selezionare valori da un db:
+	mycursor = mydb.cursor()
+	mycursor.execute("SELECT * FROM customers WHERE 1")
+	myresult = mycursor.fetchall()
+	for x in myresult:
+	  print(x)
+	  
+	  
+	  
+Aggiornare dati in un db:
+	mycursor = mydb.cursor()
+	sql = "UPDATE customers SET address = 'Canyon 123' WHERE address = 'Valley 345'"
+	mycursor.execute(sql)
+	mydb.commit()
+	
+	
+
+aggiornacarburante - Modifica il tipo di carburante
+aggiornacapienza - Modifica la capienza del serbatoio
+rifornimento - Trova il benzinaio piu' conveniente
