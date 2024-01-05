@@ -70,8 +70,11 @@ Aggiornare dati in un db:
 	
 	
 
-aggiornacarburante - Modifica il tipo di carburante
-aggiornacapienza - Modifica la capienza del serbatoio
+carburante - Modifica il tipo di carburante
+capienza - Modifica la capienza del serbatoio
 rifornimento - Trova il benzinaio piu' conveniente
+consumo - Modifica il consumo medio (L/100km)
 
 TODO create a script to install all the needed pip package if not installed
+
+reply_markup=keyboard&reply_markup=is_persistent&reply_markup=one_time_keyboard'

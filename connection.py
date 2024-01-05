@@ -37,22 +37,24 @@ class connection:
                 idImpianto = prezzo[0]
                 tipoCarburante = prezzo[1]
                 valPrezzo = prezzo[2]
+                isSelf = prezzo[3]
                 
-                try:
-                    mycursor = self.mydb.cursor()
-                    mycursor.execute("INSERT INTO Prezzi (idImpianto, tipoCarburante, prezzo) VALUES (%s, %s, %s)", (idImpianto, tipoCarburante, valPrezzo))
-                    self.mydb.commit()
-                    mycursor.close()
-                except mysql.connector.Error as err:
-                    #print("Error inserting data into Prezzi table:", err)
+                if((tipoCarburante == "Benzina" or tipoCarburante == "Diesel" or tipoCarburante == "GPL" or tipoCarburante == "Metano") and isSelf == "0"):
                     try:
                         mycursor = self.mydb.cursor()
-                        mycursor.execute("UPDATE Prezzi SET prezzo = %s WHERE idImpianto = %s AND tipoCarburante = %s", (valPrezzo, idImpianto, tipoCarburante))
+                        mycursor.execute("INSERT INTO Prezzi (idImpianto, tipoCarburante, prezzo) VALUES (%s, %s, %s)", (idImpianto, tipoCarburante, valPrezzo))
                         self.mydb.commit()
                         mycursor.close()
-                        #print("Data updated in Prezzi table")
                     except mysql.connector.Error as err:
-                        print("Error updating data in Prezzi table:", err)
+                        #print("Error inserting data into Prezzi table:", err)
+                        try:
+                            mycursor = self.mydb.cursor()
+                            mycursor.execute("UPDATE Prezzi SET prezzo = %s WHERE idImpianto = %s AND tipoCarburante = %s", (valPrezzo, idImpianto, tipoCarburante))
+                            self.mydb.commit()
+                            mycursor.close()
+                            #print("Data updated in Prezzi table")
+                        except mysql.connector.Error as err:
+                            print("Error updating data in Prezzi table:", err)
                 
         print("Prezzi aggiornati")
             
@@ -98,4 +100,12 @@ class connection:
     def uploadData(self):
         self.uploadImpianti()
         self.uploadPrezzi()
-        
+    
+    def insertUser(self, chat_id, fuelType, fuelCons, fuelCap):
+        try:
+            mycursor = self.mydb.cursor()
+            mycursor.execute("INSERT INTO users (ID, tipoCarburante, Consumo, Capienza) VALUES (%s, %s, %s, %s)", (chat_id, fuelType, fuelCons, fuelCap))
+            self.mydb.commit()
+            mycursor.close()
+        except mysql.connector.Error as err:
+            print("Error inserting data into users table:", err)    
