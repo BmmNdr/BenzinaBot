@@ -34,7 +34,7 @@ class telegramBot:
         
         if(shouldUpdateDB()):
             print("Aggiornamento dati...")
-            conn.uploadData()
+            self.conn.uploadData()
             print("Dati aggiornati")
         else:
             print("Dati già aggiornati")  
