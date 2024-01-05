@@ -24,6 +24,10 @@ if __name__ == "__main__":
         messages = naftaBot.getUpdates()
         
         for msg in messages:
+            
+            if("text" not in msg["message"]):
+                continue
+            
             chat_id = msg["message"]["chat"]["id"]
             text = msg["message"]["text"]
             

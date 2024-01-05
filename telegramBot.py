@@ -1,6 +1,7 @@
 import json
 import requests
 from connection import connection
+from openroute import openroute
 from datetime import datetime
 import os
 
@@ -31,6 +32,7 @@ class telegramBot:
         self.url = f"https://api.telegram.org/{bot_token}"
         self.offset = 0
         self.conn = connection()
+        self.openRoute = openroute()
         
         if(shouldUpdateDB()):
             print("Aggiornamento dati...")
@@ -51,7 +53,7 @@ class telegramBot:
         return data['result']
     
     #gets a message from a specific chat (for 30s)
-    def getReply(self, chat_id, offset): 
+    def getReply(self, chat_id, offset, position=False): 
         lastUpdateID = max(self.offset, offset) #internal offset to get only new messages
         
         #start_time = time.time()
@@ -64,8 +66,11 @@ class telegramBot:
             data = resp.json()
             
             for e in data["result"]:                
-                if(e["message"]["chat"]["id"] == chat_id):
+                if(e["message"]["chat"]["id"] == chat_id and position == False):
                     return e["message"]["text"], lastUpdateID
+                elif(e["message"]["chat"]["id"] == chat_id and position == True):
+                    return e["message"]["location"], lastUpdateID
+                    
                 
                 lastUpdateID = e["update_id"] + 1
     
@@ -92,7 +97,10 @@ class telegramBot:
     def UpdateFuelCap(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire la capienza del serbatoio")
         
-        reply, offset = self.getReply(chat_id, offset)
+        reply = 'a'
+        
+        while(reply.isnumeric() == False):
+            reply, offset = self.getReply(chat_id, offset)
         
         if(firstTime):
             return reply, offset
@@ -103,7 +111,10 @@ class telegramBot:
     def UpdateFuelCons(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire il consumo medio (l/100km)")
         
-        reply, offset = self.getReply(chat_id, offset)
+        reply = 'a'
+        
+        while(reply.isnumeric() == False):
+            reply, offset = self.getReply(chat_id, offset)
         
         if(firstTime):
             return reply, offset
@@ -124,4 +135,12 @@ class telegramBot:
         
     #make a refueling
     def Refuel(self, chat_id): #TODO
-        self.sendMessage(chat_id, "Rifornimento")
+        self.sendMessage(chat_id, "Rifornimento", keyboard=json.dumps({"keyboard":[[{"text":"Posizione", "request_location":True}]], "is_persistent":True, "one_time_keyboard":True}))
+        
+        location, offset = self.getReply(chat_id, self.offset, True)
+        
+        print(location)
+        
+        impianti = self.conn.getImpianti(chat_id)
+        
+        self.openRoute.findBest(location, impianti)

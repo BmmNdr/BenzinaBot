@@ -129,3 +129,28 @@ class connection:
             return myresult
         except mysql.connector.Error as err:
             print("Error getting data from users table:", err)
+            
+    def getUserFuelType(self, chatId):
+        try:
+            mycursor = self.mydb.cursor()
+            mycursor.execute(f"SELECT tipoCarburante FROM users WHERE ID = {chatId}")
+            myresult = mycursor.fetchall()
+            mycursor.close()
+            
+            return myresult
+        except mysql.connector.Error as err:
+            print("Error getting data from users table:", err)
+            
+    def getImpianti(self, chatId):
+        try:
+            
+            fuelType = self.getUserFuelType(chatId)[0][0]
+            
+            mycursor = self.mydb.cursor()
+            mycursor.execute(f"SELECT * FROM Impianti JOIN Prezzi ON Impianti.idImpianto = Prezzi.IdImpianto WHERE tipoCarburante = '{fuelType}'")
+            myresult = mycursor.fetchall()
+            mycursor.close()
+            
+            return myresult
+        except mysql.connector.Error as err:
+            print("Error getting data from Impianti table:", err)
