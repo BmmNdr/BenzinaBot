@@ -16,15 +16,14 @@ class openroute:
         self.apiKey = "5b3ce3597851110001cf6248f9f6a7e9b0d64f1fae6e7b7b0e3e4c2f"
         
     def findBest(self, location, impianti):
-        minDist = 15
+        minDist = 30
         
         nearest = []
         
         for imp in impianti:
             dist = calculate_distance(location["latitude"], location["longitude"], imp[8], imp[9])
             
-            if(dist < minDist):
-                minDist = dist
+            if(dist <= minDist):
                 nearest.append(imp)
                 
         for imp in nearest:
