@@ -109,3 +109,23 @@ class connection:
             mycursor.close()
         except mysql.connector.Error as err:
             print("Error inserting data into users table:", err)    
+            
+    def updateUser(self, chatId, colName, value):
+        try:
+            mycursor = self.mydb.cursor()
+            mycursor.execute(f"UPDATE users SET {colName}" + " = %s WHERE ID = %s", (value, chatId))
+            self.mydb.commit()
+            mycursor.close()
+        except mysql.connector.Error as err:
+            print("Error updating data in users table:", err)
+            
+    def getUser(self, chatId):
+        try:
+            mycursor = self.mydb.cursor()
+            mycursor.execute(f"SELECT * FROM users WHERE ID = {chatId}")
+            myresult = mycursor.fetchall()
+            mycursor.close()
+            
+            return myresult
+        except mysql.connector.Error as err:
+            print("Error getting data from users table:", err)

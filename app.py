@@ -30,7 +30,6 @@ if __name__ == "__main__":
             print(str(chat_id) + ": " + text)
             
             if(text == "/start"):
-                naftaBot.sendMessage(chat_id, "Benvenuto nel Nafta bot")
                 naftaBot.firstLogin(chat_id)
             elif(text == "/carburante"):
                 naftaBot.UpdateFuelType(chat_id)

@@ -78,7 +78,7 @@ class telegramBot:
         return [[{"text":"Benzina"}], [{"text":"Diesel"}], [{"text":"GPL"}], [{"text":"Metano"}]]
         
     #update the type of fuel
-    def UpdateFuelType(self, chat_id, offset, firstTime=False):
+    def UpdateFuelType(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire il tipo di carburante", keyboard=json.dumps({"keyboard":self.getKeyboard(), "is_persistent":True, "one_time_keyboard":True}))
         
         reply, offset = self.getReply(chat_id, offset)
@@ -86,10 +86,10 @@ class telegramBot:
         if(firstTime):
             return reply, offset
         
-        #TODO: update in DB
+        self.conn.updateUser(chat_id, "tipoCarburante", reply)
             
     #update the capacity of the tank
-    def UpdateFuelCap(self, chat_id, offset, firstTime=False):
+    def UpdateFuelCap(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire la capienza del serbatoio")
         
         reply, offset = self.getReply(chat_id, offset)
@@ -97,10 +97,10 @@ class telegramBot:
         if(firstTime):
             return reply, offset
         
-        #TODO: update in DB
+        self.conn.updateUser(chat_id, "Capienza", reply)
         
     #update the average fuel consumption
-    def UpdateFuelCons(self, chat_id, offset, firstTime=False):
+    def UpdateFuelCons(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire il consumo medio (l/100km)")
         
         reply, offset = self.getReply(chat_id, offset)
@@ -108,14 +108,19 @@ class telegramBot:
         if(firstTime):
             return reply, offset
         
-        #TODO: update in DB
+        self.conn.updateUser(chat_id, "Consumo", reply)
         
     def firstLogin(self, chat_id):
-        fuelType, offset = self.UpdateFuelType(chat_id, self.offset, True)
-        fuelCap, offset = self.UpdateFuelCap(chat_id, offset + 1, True)
-        fuelCons, offset = self.UpdateFuelCons(chat_id, offset + 1, True)
         
-        self.conn.insertUser(chat_id, fuelType, fuelCap, fuelCons)
+        
+        if(self.conn.getUser(chat_id) == []):
+            self.sendMessage(chat_id, "Benvenuto nel Nafta bot")
+            fuelType, offset = self.UpdateFuelType(chat_id, self.offset, True)
+            fuelCap, offset = self.UpdateFuelCap(chat_id, offset + 1, True)
+            fuelCons, offset = self.UpdateFuelCons(chat_id, offset + 1, True)
+            self.conn.insertUser(chat_id, fuelType, fuelCons, fuelCap)
+        else:
+            self.sendMessage(chat_id, "Bentornato nel Nafta bot")
         
     #make a refueling
     def Refuel(self, chat_id): #TODO
