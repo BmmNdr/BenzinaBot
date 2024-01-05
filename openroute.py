@@ -16,7 +16,7 @@ class openroute:
         self.apiKey = "5b3ce3597851110001cf6248f9f6a7e9b0d64f1fae6e7b7b0e3e4c2f"
         
     def findBest(self, location, impianti):
-        minDist = 30
+        minDist = 15
         
         nearest = []
         

@@ -65,14 +65,16 @@ class telegramBot:
             
             data = resp.json()
             
-            for e in data["result"]:                
+            for e in data["result"]:             
+                lastUpdateID = e["update_id"] + 1
+                   
                 if(e["message"]["chat"]["id"] == chat_id and position == False):
                     return e["message"]["text"], lastUpdateID
                 elif(e["message"]["chat"]["id"] == chat_id and position == True):
                     return e["message"]["location"], lastUpdateID
                     
                 
-                lastUpdateID = e["update_id"] + 1
+                
     
     #send a message to a specific chat
     def sendMessage(self, chat_id, text, keyboard=None):
@@ -127,9 +129,10 @@ class telegramBot:
         if(self.conn.getUser(chat_id) == []):
             self.sendMessage(chat_id, "Benvenuto nel Nafta bot")
             fuelType, offset = self.UpdateFuelType(chat_id, self.offset, True)
-            fuelCap, offset = self.UpdateFuelCap(chat_id, offset + 1, True)
-            fuelCons, offset = self.UpdateFuelCons(chat_id, offset + 1, True)
+            fuelCap, offset = self.UpdateFuelCap(chat_id, offset, True)
+            fuelCons, offset = self.UpdateFuelCons(chat_id, offset, True)
             self.conn.insertUser(chat_id, fuelType, fuelCons, fuelCap)
+            self.sendMessage(chat_id, "Registrazione effettuata")
         else:
             self.sendMessage(chat_id, "Bentornato nel Nafta bot")
         
@@ -144,3 +147,5 @@ class telegramBot:
         impianti = self.conn.getImpianti(chat_id)
         
         self.openRoute.findBest(location, impianti)
+        
+        print("ok")
