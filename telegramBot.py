@@ -166,3 +166,5 @@ class telegramBot:
         station = self.conn.getStation(minID)
         
         self.sendMessage(chat_id, f"Il Benzinaio piu' conveniente e' {station[0]['NomeImpianto']} a ({station[0]['Comune']}), il prezzo totale e' {minPrice} euro")
+        
+        self.sendLocation(chat_id, station[0]["Latitudine"], station[0]["Longitudine"])

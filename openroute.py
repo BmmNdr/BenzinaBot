@@ -39,9 +39,9 @@ class openroute:
                 
                 roadCons = (consumption * roadDist) / 100
                 
-                quantity += roadCons
+                totquantity = quantity + roadCons
                 
-                total = quantity * imp["prezzo"]
+                total = totquantity * imp["prezzo"]
                 
                 if(minPrice == None or total < minPrice):
                     minPrice = total
