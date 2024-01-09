@@ -83,3 +83,6 @@ reply_markup=keyboard&reply_markup=is_persistent&reply_markup=one_time_keyboard'
 consumo : 100 = x : distance
 
 consumo * distance / 100
+
+bot6450047602:AAHYA1jfTMs0DQ94YUi1NFex52v3tRMMLbo
+5b3ce3597851110001cf6248c10deadc57ba4a7c8fa9137c59e6e34a
