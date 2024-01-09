@@ -1,9 +1,0 @@
-# Ignore TMP folder
-TMP/
-
-# Ignore __pycache__ folder
-__pycache__/
-
-# Ignore all files and folders inside Data folder
-Data/*
-!Data/data_json.json
