@@ -4,6 +4,7 @@ from connection import connection
 from openroute import openroute
 from datetime import datetime
 import os
+import re
 
 def shouldUpdateDB():
         # Specify the file path
@@ -28,11 +29,11 @@ def shouldUpdateDB():
         return False
 
 class telegramBot:
-    def __init__(self, bot_token):
+    def __init__(self, bot_token, openRouteToken):
         self.url = f"https://api.telegram.org/{bot_token}"
         self.offset = 0
         self.conn = connection()
-        self.openRoute = openroute()
+        self.openRoute = openroute(openRouteToken)
         
         if(shouldUpdateDB()):
             print("Aggiornamento dati...")
@@ -73,13 +74,14 @@ class telegramBot:
                 elif(e["message"]["chat"]["id"] == chat_id and position == True):
                     return e["message"]["location"], lastUpdateID
                     
-                
-                
-    
     #send a message to a specific chat
     def sendMessage(self, chat_id, text, keyboard=None):
         params = {"chat_id":chat_id, "text":text, "reply_markup":keyboard}
         requests.post(self.url+"/sendMessage", params=params)
+        
+    def sendLocation(self, chat_id, latitude, longitude):
+        params = {"chat_id":chat_id, "latitude":latitude, "longitude":longitude}
+        requests.post(self.url+"/sendLocation", params=params)
         
     def getKeyboard(self):
         return [[{"text":"Benzina"}], [{"text":"Diesel"}], [{"text":"GPL"}], [{"text":"Metano"}]]
@@ -88,34 +90,40 @@ class telegramBot:
     def UpdateFuelType(self, chat_id, offset=0, firstTime=False):
         self.sendMessage(chat_id, "Inserire il tipo di carburante", keyboard=json.dumps({"keyboard":self.getKeyboard(), "is_persistent":True, "one_time_keyboard":True}))
         
+        offset = max(self.offset, offset)
+        
         reply, offset = self.getReply(chat_id, offset)
         
         if(firstTime):
             return reply, offset
         
         self.conn.updateUser(chat_id, "tipoCarburante", reply)
+        self.sendMessage(chat_id, "Carburante aggiornato")
             
     #update the capacity of the tank
     def UpdateFuelCap(self, chat_id, offset=0, firstTime=False):
-        self.sendMessage(chat_id, "Inserire la capienza del serbatoio")
+        offset = max(self.offset, offset)
         
         reply = 'a'
         
-        while(reply.isnumeric() == False):
+        while(re.match(r'^(([0-9]+)(\.([0-9]+))?)$', reply) is None):
+            self.sendMessage(chat_id, "Inserire la capienza del serbatoio")
             reply, offset = self.getReply(chat_id, offset)
         
         if(firstTime):
             return reply, offset
         
         self.conn.updateUser(chat_id, "Capienza", reply)
+        self.sendMessage(chat_id, "Capienza aggiornata")
         
     #update the average fuel consumption
     def UpdateFuelCons(self, chat_id, offset=0, firstTime=False):
-        self.sendMessage(chat_id, "Inserire il consumo medio (l/100km)")
+        offset = max(self.offset, offset)
         
         reply = 'a'
         
-        while(reply.isnumeric() == False):
+        while(re.match(r'^(([0-9]+)(\.([0-9]+))?)$', reply) is None):
+            self.sendMessage(chat_id, "Inserire il consumo medio (l/100km)")
             reply, offset = self.getReply(chat_id, offset)
         
         if(firstTime):
@@ -124,8 +132,6 @@ class telegramBot:
         self.conn.updateUser(chat_id, "Consumo", reply)
         
     def firstLogin(self, chat_id):
-        
-        
         if(self.conn.getUser(chat_id) == []):
             self.sendMessage(chat_id, "Benvenuto nel Nafta bot")
             fuelType, offset = self.UpdateFuelType(chat_id, self.offset, True)
@@ -137,15 +143,26 @@ class telegramBot:
             self.sendMessage(chat_id, "Bentornato nel Nafta bot")
         
     #make a refueling
-    def Refuel(self, chat_id): #TODO
-        self.sendMessage(chat_id, "Rifornimento", keyboard=json.dumps({"keyboard":[[{"text":"Posizione", "request_location":True}]], "is_persistent":True, "one_time_keyboard":True}))
+    def Refuel(self, chat_id):
+        self.sendMessage(chat_id, "Quanto vuoi rifornire?", keyboard=json.dumps({"keyboard":[[{"text":"1/4"}], [{"text":"Meta'"}], [{"text":"Pieno"}]], "is_persistent":True, "one_time_keyboard":True}))
+        quantity, offset = self.getReply(chat_id, self.offset)
         
-        location, offset = self.getReply(chat_id, self.offset, True)
+        if(quantity == "1/4"):
+            quantity = 0.25
+        elif(quantity == "Meta'"):
+            quantity = 0.5
+        else:
+            quantity = 1
         
-        print(location)
+        self.sendMessage(chat_id, "Dove ti trovi al momento?", keyboard=json.dumps({"keyboard":[[{"text":"Posizione", "request_location":True}]], "is_persistent":True, "one_time_keyboard":True}))
+        location, offset = self.getReply(chat_id, offset, position=True)
         
-        impianti = self.conn.getImpianti(chat_id)
+        stations = self.conn.getUserStations(chat_id)
         
-        self.openRoute.findBest(location, impianti)
+        self.sendMessage(chat_id, "Sto calcolando il miglior benzinaio...")
         
-        print("ok")
+        minID, minPrice = self.openRoute.findBest(location, stations, quantity * self.conn.getFromUser(chat_id, "Capienza")[0][0], self.conn.getFromUser(chat_id, "Consumo")[0][0])
+        
+        station = self.conn.getStation(minID)
+        
+        self.sendMessage(chat_id, f"Il Benzinaio piu' conveniente e' {station[0]['NomeImpianto']} a ({station[0]['Comune']}), il prezzo totale e' {minPrice} euro")

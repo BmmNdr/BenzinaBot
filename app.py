@@ -15,10 +15,11 @@ def getBotToken():
         # Parse the JSON data into a dictionary
         data_dict = json.loads(json_data)
 
-    return data_dict["botToken"]
+    return data_dict["botToken"], data_dict["openRouteToken"]
 
 if __name__ == "__main__":
-    naftaBot = telegramBot(getBotToken())    
+    token = getBotToken()
+    naftaBot = telegramBot(token[0], token[1])    
         
     while(True):
         messages = naftaBot.getUpdates()

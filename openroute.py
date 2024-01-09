@@ -1,3 +1,4 @@
+from time import sleep
 import requests
 import math
 
@@ -12,19 +13,40 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     return distance
 
 class openroute:
-    def __init__(self):
-        self.apiKey = "5b3ce3597851110001cf6248f9f6a7e9b0d64f1fae6e7b7b0e3e4c2f"
+    def __init__(self, apiKey):
+        self.baseUrl = f"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}"
         
-    def findBest(self, location, impianti):
-        minDist = 15
+    def get_RoadDistance(self, start_lat, start_lon, end_lat, end_lon):
+        url = self.baseUrl + f"&start={start_lon},{start_lat}&end={end_lon},{end_lat}"
         
-        nearest = []
+        response = requests.get(url)
+        data = response.json()
         
-        for imp in impianti:
-            dist = calculate_distance(location["latitude"], location["longitude"], imp[8], imp[9])
+        distance = data["features"][0]["properties"]["summary"]["distance"]
+        return distance
+        
+    def findBest(self, location, stations, quantity, consumption):
+        minDist = 15 #km
+        
+        minId = None
+        minPrice = None
+        
+        for imp in stations:
+            dist = calculate_distance(location["latitude"], location["longitude"], imp["Latitudine"], imp["Longitudine"])
             
             if(dist <= minDist):
-                nearest.append(imp)
+                roadDist = self.get_RoadDistance(location["latitude"], location["longitude"], imp["Latitudine"], imp["Longitudine"]) / 1000 #km
                 
-        for imp in nearest:
-            print(imp)
+                roadCons = (consumption * roadDist) / 100
+                
+                quantity += roadCons
+                
+                total = quantity * imp["prezzo"]
+                
+                if(minPrice == None or total < minPrice):
+                    minPrice = total
+                    minId = imp["idImpianto"]
+                    
+                sleep(1.5) #to avoid exceeding the API limit (40 requests per minute)
+                    
+        return minId, minPrice

@@ -58,7 +58,7 @@ class connection:
                 
         print("Prezzi aggiornati")
             
-    def uploadImpianti(self):
+    def uploadStations(self):
         
         print("Aggiornamento impianti...")
         
@@ -98,7 +98,7 @@ class connection:
         print("Impianti aggiornati")
         
     def uploadData(self):
-        self.uploadImpianti()
+        self.uploadStations()
         self.uploadPrezzi()
     
     def insertUser(self, chat_id, fuelType, fuelCons, fuelCap):
@@ -130,10 +130,10 @@ class connection:
         except mysql.connector.Error as err:
             print("Error getting data from users table:", err)
             
-    def getUserFuelType(self, chatId):
+    def getFromUser(self, chatId, colName):
         try:
             mycursor = self.mydb.cursor()
-            mycursor.execute(f"SELECT tipoCarburante FROM users WHERE ID = {chatId}")
+            mycursor.execute(f"SELECT {colName} FROM users WHERE ID = {chatId}")
             myresult = mycursor.fetchall()
             mycursor.close()
             
@@ -141,14 +141,35 @@ class connection:
         except mysql.connector.Error as err:
             print("Error getting data from users table:", err)
             
-    def getImpianti(self, chatId):
+    def getUserStations(self, chatId):
         try:
             
-            fuelType = self.getUserFuelType(chatId)[0][0]
+            fuelType = self.getFromUser(chatId, "tipoCarburante")[0][0]
             
             mycursor = self.mydb.cursor()
             mycursor.execute(f"SELECT * FROM Impianti JOIN Prezzi ON Impianti.idImpianto = Prezzi.IdImpianto WHERE tipoCarburante = '{fuelType}'")
-            myresult = mycursor.fetchall()
+            
+            #return a DB as dictionary
+            myresult = [dict((mycursor.description[i][0], value) \
+               for i, value in enumerate(row)) for row in mycursor.fetchall()]
+            
+            #myresult = mycursor.fetchall()
+            
+            mycursor.close()
+            return myresult
+        except mysql.connector.Error as err:
+            print("Error getting data from Impianti table:", err)
+            
+    def getStation(self, idImpianto):
+        try:
+            mycursor = self.mydb.cursor()
+            mycursor.execute(f"SELECT * FROM Impianti WHERE idImpianto = {idImpianto}")
+            
+            #return a DB as dictionary
+            myresult = [dict((mycursor.description[i][0], value) \
+               for i, value in enumerate(row)) for row in mycursor.fetchall()]
+            
+            #myresult = mycursor.fetchall()
             mycursor.close()
             
             return myresult

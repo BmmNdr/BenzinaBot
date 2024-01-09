@@ -78,3 +78,8 @@ consumo - Modifica il consumo medio (L/100km)
 TODO create a script to install all the needed pip package if not installed
 
 reply_markup=keyboard&reply_markup=is_persistent&reply_markup=one_time_keyboard'
+
+
+consumo : 100 = x : distance
+
+consumo * distance / 100
