@@ -18,11 +18,15 @@ The best gas station is the one where refueling the quantity you selected plus w
 - Telegram Bot
   - Use Bot Father (@BotFather) to create it
   - Insert the bot token in the json_dati file
-  - Add this commands to the bot:
-   carburante - Modifica il tipo di carburante
-   capienza - Modifica la capienza del serbatoio
-   consumo - Modifica il consumo medio (L/100km)
+  - Add this commands to the bot:   
+   carburante - Modifica il tipo di carburante   
+   capienza - Modifica la capienza del serbatoio   
+   consumo - Modifica il consumo medio (L/100km)   
    rifornimento - Trova il benzinaio piu' conveniente
 - Open Route API (https://openrouteservice.org)
 - Python packages: `pip install -r Data/requirements.txt`
 - Load the database from the sql file
+
+## Known Issue
+
+It does not work with multiple users. To do so it should implement threading and modify the getUpdates and getReply methods. getUpdates should have a dedicated thread an put the updates in a shared array, where messages will be removed after they have been read.
